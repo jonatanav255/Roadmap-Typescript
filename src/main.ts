@@ -37,6 +37,28 @@ const fetchUsers = async (): Promise<User[]> => {
   }
 }
 
+const addUser = async (username: string, email: string): Promise<User> => {
+  try {
+    const response = await fetch(postUserUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, email })
+    })
+
+    if (!response.ok) {
+      throw new Error('Error adding user')
+    }
+
+    const user: User = await response.json()
+    return user
+  } catch (error) {
+    console.error('Error adding user: ', error)
+    throw error
+  }
+}
+
 const displayUsers = async (): Promise<void> => {
   try {
     const users = await fetchUsers()
@@ -73,15 +95,18 @@ function displayAddUserForm () {
   const userNameInput = document.getElementById('username') as HTMLInputElement
   const emailInput = document.getElementById('email') as HTMLInputElement
 
-  addUserForm.addEventListener('submit', event => {
+  addUserForm.addEventListener('submit', async (event: Event) => {
     event.preventDefault()
 
-    users.push({ username: userNameInput.value, email: emailInput.value })
-
-    addUserForm.reset()
-
-    alert('User added successfully!')
-    displayUsers()
+    try {
+      const newUser = await addUser(userNameInput.value, emailInput.value)
+      addUserForm.reset()
+      alert(`User ${newUser.username} added successfully!`)
+      displayUsers()
+    } catch (error) {
+      alert('Error adding user. Please try again later.')
+      throw error
+    }
   })
 }
 
