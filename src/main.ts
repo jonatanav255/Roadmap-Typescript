@@ -1,5 +1,10 @@
 import './style.css'
 
+interface User {
+  id: number
+  username: string
+  email: string
+}
 const contentDiv = document.getElementById('content') as HTMLDivElement
 const viewUsersLink = document.getElementById(
   'view-users-link'
@@ -13,14 +18,41 @@ let users = [
   { username: 'user1', email: 'user1@example.com' },
   { username: 'user2', email: 'user2@example.com' }
 ]
-function displayUsers () {
-  const userListHtml = `<h2>Get All Users</h2>
+
+const apiBaseUrl = 'http://localhost:8080' // Replace with your actual API URL
+const getUsersUrl = `${apiBaseUrl}/users` // Endpoint for getting all users
+const postUserUrl = `${apiBaseUrl}/users`
+
+const fetchUsers = async (): Promise<User[]> => {
+  try {
+    const response = await fetch(getUsersUrl)
+    if (!response.ok) {
+      throw new Error('Error fetching users')
+    }
+    const users: User[] = await response.json() // Expecting an array of users
+    return users
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    throw error
+  }
+}
+
+const displayUsers = async (): Promise<void> => {
+  try {
+    const users = await fetchUsers()
+    const userListHtml = `
+                <h2>Get All Users</h2>
                 <ul>
-                ${users
-                  .map(user => `<li>${user.username} ${user.email}</li>`)
-                  .join('')}
-                </ul>`
-  contentDiv.innerHTML = userListHtml
+                  ${users
+                    .map(user => `<li>${user.username} (${user.email})</li>`)
+                    .join('')}
+                </ul>
+              `
+    contentDiv.innerHTML = userListHtml
+  } catch (error) {
+    contentDiv.innerHTML =
+      '<p>Error fetching users. Please try again later.</p>'
+  }
 }
 function displayAddUserForm () {
   const addUserFormHtml = `
