@@ -13,12 +13,6 @@ const addUsersLink = document.getElementById(
   'add-user-link'
 ) as HTMLAnchorElement
 
-// Sample user data
-let users = [
-  { username: 'user1', email: 'user1@example.com' },
-  { username: 'user2', email: 'user2@example.com' }
-]
-
 const apiBaseUrl = 'http://localhost:8080' // Replace with your actual API URL
 const getUsersUrl = `${apiBaseUrl}/users` // Endpoint for getting all users
 const postUserUrl = `${apiBaseUrl}/users`
